@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <title>Traveling with Belarus passport</title>
+  <link rel="stylesheet" href="https://unpkg.com/tippy.js@6.3.7/themes/light.css" />
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+  <style>
+    html, body, svg { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    *:focus { outline: none; }
+  </style>
+</head>
+
+<body>
+  <script type="module">
+    import * as map from "./map.js"
+    import * as data from "./data.js"
+
+    tippy.setDefaultProps({
+      theme: "light",
+      allowHTML: true,
+      sticky: true,
+    })
+
+    Promise.all([
+      data.get(),
+      map.render("body"),
+    ]).then(([data, container]) => {
+      for (const key in data) {
+        const country = key
+        const { requirement, stay, notes } = data[key]
+
+        let el = container.querySelector(`[name="${country}"]`)
+        
+        if (!el) continue
+
+        const color = requirement.includes("not required")
+          ? "rgba(70,147,104,0.8)"
+          : requirement.includes("on arrival")
+            ? "rgba(230,163,128,0.8)"
+            : "rgba(160,160,160,0.8)"
+
+        el.style.fill = color
+
+        let content = `<div>${key}</div>`
+        if (stay) content += `<div>${stay}</div>`
+        if (notes) content += `<div>${notes}</div>`
+
+        const opts = { content }
+
+        // if (stay)
+        //   Object.assign(opts, {
+        //     showOnCreate: true,
+        //     hideOnClick: false,
+        //   })
+
+        tippy(el, opts)
+      }
+    })
+  </script>
+</body>
+
+</html>
